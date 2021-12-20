@@ -4,6 +4,7 @@ import {
   LayoutAnimation,
   Text,
   TouchableOpacity,
+  TouchableHighlight,
   StyleSheet,
   View,
   Dimensions,
@@ -20,7 +21,9 @@ const Animation = () => {
   const [height, setHeight] = useState(100);
   const [counter, setCounter] = useState(0);
   const [color, setColor] = useState("red");
-  const [shape, setShape] = useState("box");
+  const [shape, setShape] = useState("square");
+
+  const [obsah, setObsah] = useState(0);
 
   const _onPress = () => {
     // Animate the update
@@ -39,21 +42,32 @@ const Animation = () => {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={_onPress}>
-        <View
-          style={[
-            styles.box,
-            { width: width, height: height, backgroundColor: color },
-          ]}
-        />
-      </TouchableOpacity>
-      <View style={styles.bottom}>
-        <Text style={styles.counter}>Total pops: {counter}</Text>
-      </View>
-    </View>
-  );
+  switch (shape) {
+    case 'circle':
+      return (
+        <View style={styles.container}>
+          <TouchableOpacity onPress={_onPress}>
+            <ShapeCircle width={width} height={height} color={color} />
+          </TouchableOpacity>
+          <View style={styles.bottom}>
+            <Text style={styles.counter}>Total pops: {counter}</Text>
+          </View>
+        </View>
+      );
+    case 'square':
+      return (
+        <View style={styles.container}>
+          <TouchableOpacity onPress={_onPress}>
+            <ShapeSquare width={width} height={height} color={color} />
+          </TouchableOpacity>
+          <View style={styles.bottom}>
+            <Text style={styles.counter}>Total pops: {counter}</Text>
+          </View>
+        </View>
+      );
+  }
+
+
 };
 
 const getRandomColor = () => {
@@ -70,7 +84,48 @@ const getRandomColor = () => {
 
 //TODO: return a random styles shape
 const getRandomShape = () => {
-  return "box";
+  const shapes = ['square', 'circle']
+  return shapes[Math.floor(Math.random() * shapes.length)];
+};
+
+interface ShapeProps {
+  width: number;
+  height: number;
+  color: string;
+}
+
+const ShapeCircle: React.FC<ShapeProps> = ({ width, height, color }) => {
+  return (
+    <View
+      style={{
+        borderRadius:
+          Math.round(
+            Dimensions.get("window").width + Dimensions.get("window").height
+          ) / 2,
+        width: width / 2,
+        height: height / 2,
+        backgroundColor: color,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    />
+  );
+};
+
+const ShapeSquare: React.FC<ShapeProps> = ({ width, height, color }) => {
+  return (
+    <View
+      style={[
+        styles.box,
+        { width: width, height: height, backgroundColor: color },
+      ]}
+    />
+  );
+};
+
+//TODO: pytagoras nebo tak
+const ShapeTriangle: React.FC<ShapeProps> = ({ width, height, color }) => {
+  return null;
 };
 
 const styles = StyleSheet.create({
