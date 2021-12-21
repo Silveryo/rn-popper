@@ -9,6 +9,7 @@ import {
   View,
   Dimensions,
 } from "react-native";
+import { ShapeCircle, ShapeSquare } from "./ShapeProps";
 
 const { UIManager } = NativeModules;
 const windowWidth = Dimensions.get("window").width;
@@ -20,16 +21,18 @@ const Animation = () => {
   const [width, setWidth] = useState(100);
   const [height, setHeight] = useState(100);
   const [counter, setCounter] = useState(0);
-  const [color, setColor] = useState("red");
-  const [shape, setShape] = useState("square");
+  const [color, setColor] = useState(getRandomColor());
+  const [shape, setShape] = useState(getRandomShape());
 
-  const [obsah, setObsah] = useState(0);
+  const [area, setArea] = useState(getArea(width, height, shape));
 
   const _onPress = () => {
     // Animate the update
     LayoutAnimation.spring();
-    setWidth(width + Math.random() * (100 - 15));
-    setHeight(height + Math.random() * (100 - 15));
+    setWidth(width + Math.floor(Math.random() * (100 - 15)));
+    setHeight(height + Math.floor(Math.random() * (100 - 15)));
+    setArea(getArea(width, height, shape));
+    console.log(area);
 
     // Pop the element
     if (width >= windowWidth || height >= windowWidth) {
@@ -43,31 +46,39 @@ const Animation = () => {
   };
 
   switch (shape) {
-    case 'circle':
+    case "circle":
       return (
-        <View style={styles.container}>
-          <TouchableOpacity onPress={_onPress}>
-            <ShapeCircle width={width} height={height} color={color} />
-          </TouchableOpacity>
+        <>
+          <View style={styles.container}>
+            <TouchableOpacity onPress={_onPress}>
+              <ShapeCircle width={width} height={height} color={color} />
+            </TouchableOpacity>
+          </View>
           <View style={styles.bottom}>
             <Text style={styles.counter}>Total pops: {counter}</Text>
+            <Text style={styles.counter}>
+              Width: {width}pt Height: {height}pt Area: {area}pt
+            </Text>
           </View>
-        </View>
+        </>
       );
-    case 'square':
+    case "square":
       return (
-        <View style={styles.container}>
-          <TouchableOpacity onPress={_onPress}>
-            <ShapeSquare width={width} height={height} color={color} />
-          </TouchableOpacity>
+        <>
+          <View style={styles.container}>
+            <TouchableOpacity onPress={_onPress}>
+              <ShapeSquare width={width} height={height} color={color} />
+            </TouchableOpacity>
+          </View>
           <View style={styles.bottom}>
             <Text style={styles.counter}>Total pops: {counter}</Text>
+            <Text style={styles.counter}>
+              Width: {width}pt Height: {height}pt Area: {area}pt
+            </Text>
           </View>
-        </View>
+        </>
       );
   }
-
-
 };
 
 const getRandomColor = () => {
@@ -82,53 +93,23 @@ const getRandomColor = () => {
   );
 };
 
-//TODO: return a random styles shape
 const getRandomShape = () => {
-  const shapes = ['square', 'circle']
+  const shapes = ["square", "circle"];
   return shapes[Math.floor(Math.random() * shapes.length)];
 };
 
-interface ShapeProps {
-  width: number;
-  height: number;
-  color: string;
-}
-
-const ShapeCircle: React.FC<ShapeProps> = ({ width, height, color }) => {
-  return (
-    <View
-      style={{
-        borderRadius:
-          Math.round(
-            Dimensions.get("window").width + Dimensions.get("window").height
-          ) / 2,
-        width: width / 2,
-        height: height / 2,
-        backgroundColor: color,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    />
-  );
+const getArea = (width: number, height: number, shape: string): number => {
+  switch (shape) {
+    case "square":
+      return Math.floor(width * height);
+    case "circle":
+      return Math.floor(Math.PI * width * height);
+    default:
+      return 0;
+  }
 };
 
-const ShapeSquare: React.FC<ShapeProps> = ({ width, height, color }) => {
-  return (
-    <View
-      style={[
-        styles.box,
-        { width: width, height: height, backgroundColor: color },
-      ]}
-    />
-  );
-};
-
-//TODO: pytagoras nebo tak
-const ShapeTriangle: React.FC<ShapeProps> = ({ width, height, color }) => {
-  return null;
-};
-
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
